@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "sql12630973",
-    "password": "sAXMJ6nRwb",
-    "database": "sql12630973",
-    "host": "sql12.freemysqlhosting.net",
+    "username": "root",
+    "password": "password",
+    "database": "collections_app",
+    "host": "localhost",
     "dialect": "mysql"
   },
   "test": {
