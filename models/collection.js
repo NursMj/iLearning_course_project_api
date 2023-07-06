@@ -2,8 +2,8 @@ module.exports = (sequelize, DataTypes) => {
   const Collection = sequelize.define('Collection', {
     name: { type: DataTypes.STRING, allowNull: false },
     desc: { type: DataTypes.STRING, allowNull: false },
-    topicId: { type: DataTypes.STRING, allowNull: false },
-    userId: { type: DataTypes.STRING, allowNull: false },
+    // topicId: { type: DataTypes.STRING, allowNull: false },
+    // userId: { type: DataTypes.STRING, allowNull: false },
     img: { type: DataTypes.STRING, defaultValue: '' },
   })
 

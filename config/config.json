@@ -1,22 +1,22 @@
 {
   "development": {
-    "username": "root",
-    "password": "password",
-    "database": "collections_app",
-    "host": "localhost",
+    "username": "sql12630973",
+    "password": "sAXMJ6nRwb",
+    "database": "sql12630973",
+    "host": "sql12.freemysqlhosting.net",
     "dialect": "mysql"
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
+    "username": "sql12630973",
+    "password": "sAXMJ6nRwb",
+    "database": "sql12630973",
+    "host": "sql12.freemysqlhosting.net",
     "dialect": "mysql"
   },
   "production": {
-    "username": "sql12623648",
-    "password": "NjdVj5XsN9",
-    "database": "sql12623648",
+    "username": "sql12630973",
+    "password": "sAXMJ6nRwb",
+    "database": "sql12630973",
     "host": "sql12.freemysqlhosting.net",
     "dialect": "mysql"
   }
