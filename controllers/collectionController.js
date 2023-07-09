@@ -1,12 +1,12 @@
 // const uuid = require('uuid')
 // const path = require('path')
 const ApiError = require('../error/ApiError')
-const { Collection } = require('../models')
+const { Collection, Topic, ItemPattern } = require('../models')
 
 class collectionController {
   async create(req, res, next) {
     try {
-      const { name, desc, topicId, userId } = req.body
+      const { name, desc, topicId, userId, itemFields } = req.body
       //   const { img } = req.files
       //   let fileName = uuid.v4() + '.jpg'
       //   img.mv(path.resolve(__dirname, '..', 'static', fileName))
@@ -14,23 +14,17 @@ class collectionController {
       const collection = await Collection.create({
         name,
         desc,
-        userId,
-        topicId,
+        UserId: userId,
+        TopicId: topicId,
         img: '',
       })
 
-      //   if (info) {
-      //     info = JSON.parse(info)
-      //     info.forEach((i) => {
-      //       DeviceInfo.create({
-      //         title: i.title,
-      //         description: i.description,
-      //         deviceId: device.id,
-      //       })
-      //     })
-      //   }
+      const itemPattern = await ItemPattern.create({
+        CollectionId: collection.id,
+        ...itemFields
+      })
 
-      return res.json(collection)
+      return res.json([collection, itemPattern])
     } catch (e) {
       next(ApiError.badRequest(e.message))
       console.log(e.message)
@@ -42,12 +36,12 @@ class collectionController {
     page = +page || 1
     limit = +limit || 50
     let offset = page * limit - limit
-    let collection
+    let collections
     if (!brandId && !topicId) {
-      collection = await Collection.findAndCountAll({ limit, offset })
+      collections = await Collection.findAndCountAll({ limit, offset })
     }
     if (!brandId && topicId) {
-      collection = await Collection.findAndCountAll({
+      collections = await Collection.findAndCountAll({
         where: { topicId },
         limit,
         offset,
@@ -67,7 +61,7 @@ class collectionController {
     //     offset,
     //   })
     // }
-    return res.json(collection)
+    return res.json(collections)
   }
 
   async getOne(req, res) {
@@ -77,7 +71,13 @@ class collectionController {
       //   include: [{ model: DeviceInfo, as: 'info' }],
     })
 
-    return res.json(collection)
+    const topic = await Topic.findOne({where: { id: collection.TopicId }})
+
+    // collection.topic = topic.name
+
+    // const collectionWithTopic = {...collection, topic: topic.name}
+
+    return res.json({collection, topic})
   }
 
   async delete(req, res) {

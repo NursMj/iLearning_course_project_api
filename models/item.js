@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   Item.associate = (models) => {
-    Item.belongsTo(models.Collection)
+    Item.belongsTo(models.ItemPattern)
     // Collection.hasMany(models.Item, {as: 'item'})
     // Define other associations here
   }
