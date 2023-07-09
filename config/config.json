@@ -7,16 +7,16 @@
     "dialect": "mysql"
   },
   "test": {
-    "username": "sql12630973",
-    "password": "sAXMJ6nRwb",
-    "database": "sql12630973",
+    "username": "sql12631493",
+    "password": "bXVRqcwbCW",
+    "database": "sql12631493",
     "host": "sql12.freemysqlhosting.net",
     "dialect": "mysql"
   },
   "production": {
-    "username": "sql12630973",
-    "password": "sAXMJ6nRwb",
-    "database": "sql12630973",
+    "username": "sql12631493",
+    "password": "bXVRqcwbCW",
+    "database": "sql12631493",
     "host": "sql12.freemysqlhosting.net",
     "dialect": "mysql"
   }
