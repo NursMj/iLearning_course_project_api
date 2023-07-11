@@ -5,8 +5,6 @@ const fileUpload = require('express-fileupload')
 const db = require('./models')
 const router = require('./routes/index')
 const errorHandler = require('./middleware/ErrorHandlingMiddleware')
-// const topics = require('./topics.js')
-// const { Topic } = require('./models')
 
 const port = process.env.PORT || 5000
 
@@ -20,15 +18,6 @@ app.use(errorHandler)
 app.get('/', (req, res) => {
   res.send('Hello, Express!')
 })
-
-// topics.map(async (t) => {
-//   try {
-//     const topic = await Topic.create({ name: t })
-//     console.log('created topic: ', t)
-//   } catch (error) {
-//     console.log(error.message)
-//   }
-// })
 
 const start = async () => {
   try {

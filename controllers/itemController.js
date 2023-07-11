@@ -1,81 +1,81 @@
-const uuid = require('uuid')
-const path = require('path')
 const ApiError = require('../error/ApiError')
+const { Item, Topic, ItemPattern } = require('../models')
 
 class itemController {
   async create(req, res, next) {
     try {
-      let { name, price, brandId, typeId, info } = req.body
-      const { img } = req.files
-      let fileName = uuid.v4() + '.jpg'
-      img.mv(path.resolve(__dirname, '..', 'static', fileName))
+      const { fieldValues, fieldNames, itemPatternId } = req.body
 
-      const device = await Device.create({
-        name,
-        price,
-        brandId,
-        typeId,
-        img: fileName,
+      const itemPattern = await ItemPattern.findOne({where: {id: itemPatternId}})
+      const collectionId = itemPattern.CollectionId
+      const userId = itemPattern.UserId
+
+      const item = await Item.create({
+        UserId: userId,
+        CollectionId: collectionId,
+        ItemPatternId: itemPatternId,
+        ...fieldValues,
+        ...fieldNames
       })
 
-      if (info) {
-        info = JSON.parse(info)
-        info.forEach((i) => {
-          DeviceInfo.create({
-            title: i.title,
-            description: i.description,
-            deviceId: device.id,
-          })
-        })
-      }
-
-      return res.json(device)
+      return res.json(item)
     } catch (e) {
       next(ApiError.badRequest(e.message))
+      console.log(e.message)
     }
   }
 
   async getAll(req, res) {
-    let { brandId, typeId, limit, page } = req.query
-    page = page || 1
-    limit = limit || 12
+    let { brandId, topicId, limit, page } = req.query
+    page = +page || 1
+    limit = +limit || 50
     let offset = page * limit - limit
-    let devices
-    if (!brandId && !typeId) {
-      devices = await Device.findAndCountAll({ limit, offset })
+    let items
+    if (!brandId && !topicId) {
+      items = await Item.findAndCountAll({ limit, offset })
     }
-    if (brandId && !typeId) {
-      devices = await Device.findAndCountAll({
-        where: { brandId },
+    if (!brandId && topicId) {
+      items = await Item.findAndCountAll({
+        where: { topicId },
         limit,
         offset,
       })
     }
-    if (!brandId && typeId) {
-      devices = await Device.findAndCountAll({
-        where: { typeId },
-        limit,
-        offset,
-      })
-    }
-    if (brandId && typeId) {
-      devices = await Device.findAndCountAll({
-        where: { brandId, typeId },
-        limit,
-        offset,
-      })
-    }
-    return res.json(devices)
+    // if (brandId && !typeId) {
+    //   devices = await Device.findAndCountAll({
+    //     where: { brandId },
+    //     limit,
+    //     offset,
+    //   })
+    // }
+    // if (brandId && typeId) {
+    //   devices = await Device.findAndCountAll({
+    //     where: { brandId, typeId },
+    //     limit,
+    //     offset,
+    //   })
+    // }
+    return res.json(items)
   }
 
   async getOne(req, res) {
     const { id } = req.params
-    const device = await Device.findOne({
+    const item = await Item.findOne({
       where: { id },
-      include: [{ model: DeviceInfo, as: 'info' }],
+        include: [{ model: ItemeInfo, as: 'info' }],
     })
 
-    return res.json(device)
+    const topic = await Topic.findOne({ where: { id: item.TopicId } })
+
+    return res.json({ item, topic })
+  }
+
+  async delete(req, res) {
+    const { id } = req.params
+    await Collection.destroy({
+      where: { id },
+    })
+    res.json({ message: 'Collection deleted successfully' })
   }
 }
 

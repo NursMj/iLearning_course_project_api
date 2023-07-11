@@ -3,13 +3,14 @@ module.exports = (sequelize, DataTypes) => {
     name: { type: DataTypes.STRING, allowNull: false },
     desc: { type: DataTypes.STRING, allowNull: false },
     img: { type: DataTypes.STRING, defaultValue: '' },
+    
   })
 
   Collection.associate = (models) => {
     Collection.belongsTo(models.User)
     Collection.belongsTo(models.Topic)
     Collection.hasOne(models.ItemPattern)
-    // Define other associations here
+    Collection.hasMany(models.Item)
   }
 
   return Collection

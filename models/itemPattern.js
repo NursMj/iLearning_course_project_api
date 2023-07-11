@@ -1,27 +1,27 @@
 module.exports = (sequelize, DataTypes) => {
     const ItemPattern = sequelize.define('ItemPattern', {
-      integerField1_name: { type: DataTypes.STRING, defaultValue: ''},
-      integerField2_name: { type: DataTypes.STRING, defaultValue: ''},
-      integerField3_name: { type: DataTypes.STRING, defaultValue: ''},
-      stringField1_name: { type: DataTypes.STRING, defaultValue: ''},
-      stringField2_name: { type: DataTypes.STRING, defaultValue: ''},
-      stringField3_name: { type: DataTypes.STRING, defaultValue: ''},
-      multilineField1_name: { type: DataTypes.STRING, defaultValue: ''},
-      multilineField2_name: { type: DataTypes.STRING, defaultValue: ''},
-      multilineField3_name: { type: DataTypes.STRING, defaultValue: ''},
-      dooleanField1_name: { type: DataTypes.STRING, defaultValue: ''},
-      dooleanField2_name: { type: DataTypes.STRING, defaultValue: ''},
-      dooleanField3_name: { type: DataTypes.STRING, defaultValue: ''},
-      dataField1_name: { type: DataTypes.STRING, defaultValue: ''},
-      dataField2_name: { type: DataTypes.STRING, defaultValue: ''},
-      dataField3_name: { type: DataTypes.STRING, defaultValue: ''},
+      requiredField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: 'Name'},
+      integerField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      integerField2_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      integerField3_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      stringField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      stringField2_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      stringField3_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      multilineField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      multilineField2_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      multilineField3_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dooleanField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dooleanField2_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dooleanField3_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dateField1_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dateField2_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
+      dateField3_name: { type: DataTypes.STRING, allowNull: false, defaultValue: ''},
     })
   
     ItemPattern.associate = (models) => {
         ItemPattern.belongsTo(models.Collection)
+        ItemPattern.belongsTo(models.User)
         ItemPattern.hasMany(models.Item)
-      // Collection.hasMany(models.Item, {as: 'item'})
-      // Define other associations here
     }
     
     return ItemPattern

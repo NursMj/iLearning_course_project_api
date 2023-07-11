@@ -1,7 +1,7 @@
 // const uuid = require('uuid')
 // const path = require('path')
 const ApiError = require('../error/ApiError')
-const { Collection, Topic, ItemPattern } = require('../models')
+const { Collection, Topic, ItemPattern, User } = require('../models')
 
 class collectionController {
   async create(req, res, next) {
@@ -21,7 +21,8 @@ class collectionController {
 
       const itemPattern = await ItemPattern.create({
         CollectionId: collection.id,
-        ...itemFields
+        UserId: userId,
+        ...itemFields,
       })
 
       return res.json([collection, itemPattern])
@@ -68,16 +69,14 @@ class collectionController {
     const { id } = req.params
     const collection = await Collection.findOne({
       where: { id },
-      //   include: [{ model: DeviceInfo, as: 'info' }],
+      include: [
+        { model: Topic, as: 'Topic' },
+        { model: User, as: 'User' },
+        { model: ItemPattern, as: 'ItemPattern' },
+      ],
     })
 
-    const topic = await Topic.findOne({where: { id: collection.TopicId }})
-
-    // collection.topic = topic.name
-
-    // const collectionWithTopic = {...collection, topic: topic.name}
-
-    return res.json({collection, topic})
+    return res.json(collection)
   }
 
   async delete(req, res) {

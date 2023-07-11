@@ -27,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = (models) => {
     User.hasMany(models.Collection)
-    // Define other associations here
+    User.hasMany(models.ItemPattern)
+    User.hasMany(models.Item)
   }
 
   return User
