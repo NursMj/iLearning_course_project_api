@@ -21,30 +21,22 @@ class itemController {
   }
 
   async getAll(req, res) {
-    let { brandId, topicId, limit, page } = req.query
+    let { collectionId, limit, page } = req.query
     page = +page || 1
     limit = +limit || 50
     let offset = page * limit - limit
     let items
-    if (!brandId && !topicId) {
+    if (!collectionId) {
       items = await Item.findAndCountAll({ limit, offset })
-    }
-    if (!brandId && topicId) {
+    } else {
       items = await Item.findAndCountAll({
-        where: { topicId },
+        where: { CollectionId: collectionId },
         limit,
         offset,
       })
     }
-    // if (brandId && !typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { brandId },
-    //     limit,
-    //     offset,
-    //   })
-    // }
     // if (brandId && typeId) {
-    //   devices = await Device.findAndCountAll({
+    //   items = await Device.findAndCountAll({
     //     where: { brandId, typeId },
     //     limit,
     //     offset,
