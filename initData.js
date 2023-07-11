@@ -1,22 +1,26 @@
 const topics = require('./topics.js')
-const { Topic, User, Collection, Item } = require('./models')
+const { Topic, User } = require('./models')
+
+const bcrypt = require('bcrypt')
 
 async function initData() {
+  const hashPassword = await bcrypt.hash('123', 5)
+
   await User.create({
     name: 'Nurs',
     email: 'Nurs@gmail.com',
-    password: '123',
+    password: hashPassword,
     role: 'ADMIN',
   })
   await User.create({
     name: 'Nachu',
     email: 'Nachu@gmail.com',
-    password: '123',
+    password: hashPassword,
   })
   await User.create({
     name: 'Erdan',
     email: 'Erdan@gmail.com',
-    password: '123',
+    password: hashPassword,
   })
 
   topics.map(async (t) => {
@@ -27,21 +31,6 @@ async function initData() {
       console.log(error.message)
     }
   })
-
-//   await Collection.create({
-//     name: 'My Shoes',
-//     desc: 'My shoes desc',
-//     topicId: '1',
-//     userId: '1',
-//     itemFields: {
-//       requiredField1_value: 'Name',
-//       integerField1_name: 'Size',
-//       integerField2_name: 'Price',
-//       stringField1_name: 'Brand',
-//     },
-//   })
-
-//   await Item.create({})
 }
 
 initData()

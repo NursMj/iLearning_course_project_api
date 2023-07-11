@@ -4,16 +4,11 @@ const { Item, Topic, ItemPattern } = require('../models')
 class itemController {
   async create(req, res, next) {
     try {
-      const { fieldValues, fieldNames, itemPatternId } = req.body
-
-      const itemPattern = await ItemPattern.findOne({where: {id: itemPatternId}})
-      const collectionId = itemPattern.CollectionId
-      const userId = itemPattern.UserId
+      const { fieldValues, fieldNames, collectionId, userId } = req.body
 
       const item = await Item.create({
         UserId: userId,
         CollectionId: collectionId,
-        ItemPatternId: itemPatternId,
         ...fieldValues,
         ...fieldNames
       })

@@ -1,7 +1,7 @@
 // const uuid = require('uuid')
 // const path = require('path')
 const ApiError = require('../error/ApiError')
-const { Collection, Topic, ItemPattern, User } = require('../models')
+const { Collection, Topic } = require('../models')
 
 class collectionController {
   async create(req, res, next) {
@@ -17,15 +17,16 @@ class collectionController {
         UserId: userId,
         TopicId: topicId,
         img: '',
-      })
-
-      const itemPattern = await ItemPattern.create({
-        CollectionId: collection.id,
-        UserId: userId,
         ...itemFields,
       })
 
-      return res.json([collection, itemPattern])
+      // const itemPattern = await ItemPattern.create({
+      //   CollectionId: collection.id,
+      //   UserId: userId,
+      //   ...itemFields,
+      // })
+
+      return res.json(collection)
     } catch (e) {
       next(ApiError.badRequest(e.message))
       console.log(e.message)
@@ -71,8 +72,8 @@ class collectionController {
       where: { id },
       include: [
         { model: Topic, as: 'Topic' },
-        { model: User, as: 'User' },
-        { model: ItemPattern, as: 'ItemPattern' },
+        // { model: User, as: 'User' },
+        // { model: ItemPattern, as: 'ItemPattern' },
       ],
     })
 
