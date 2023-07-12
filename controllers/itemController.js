@@ -10,7 +10,7 @@ class itemController {
         UserId: userId,
         CollectionId: collectionId,
         ...fieldValues,
-        ...fieldNames
+        ...fieldNames,
       })
 
       return res.json(item)
@@ -23,7 +23,7 @@ class itemController {
   async getAll(req, res) {
     let { collectionId, limit, page } = req.query
     page = +page || 1
-    limit = +limit || 50
+    limit = +limit || 20
     let offset = page * limit - limit
     let items
     if (!collectionId) {
@@ -49,20 +49,37 @@ class itemController {
     const { id } = req.params
     const item = await Item.findOne({
       where: { id },
-        include: [{ model: ItemeInfo, as: 'info' }],
+      // include: [
+      //   { model: Topic, as: 'Topic' }
+      // ],
     })
 
-    const topic = await Topic.findOne({ where: { id: item.TopicId } })
+    // const topic = await Topic.findOne({ where: { id: item.TopicId } })
 
-    return res.json({ item, topic })
+    return res.json(item)
   }
 
   async delete(req, res) {
     const { id } = req.params
-    await Collection.destroy({
+    await Item.destroy({
       where: { id },
     })
-    res.json({ message: 'Collection deleted successfully' })
+    res.json({ message: 'Item deleted successfully' })
+  }
+
+  async getLatest(req, res) {
+    const { limit } = req.query
+    limit = +limit || 12
+    try {
+      const latestRecords = await Item.findAll({
+        order: [['createdAt', 'DESC']],
+        limit: limit,
+      })
+      return res.json('latestRecords')
+    } catch (error) {
+      next(ApiError.badRequest(e.message))
+      console.log(e.message)
+    }
   }
 }
 

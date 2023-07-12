@@ -30,7 +30,7 @@ class collectionController {
   async getAll(req, res) {
     let { brandId, topicId, limit, page } = req.query
     page = +page || 1
-    limit = +limit || 50
+    limit = +limit || 20
     let offset = page * limit - limit
     let collections
     if (!brandId && !topicId) {
