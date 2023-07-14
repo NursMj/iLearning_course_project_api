@@ -1,7 +1,8 @@
 // const uuid = require('uuid')
 // const path = require('path')
+const Sequelize = require('sequelize')
 const ApiError = require('../error/ApiError')
-const { Collection, Topic, Item } = require('../models')
+const { Collection, Topic, Item, User } = require('../models')
 
 class collectionController {
   async create(req, res, next) {
@@ -28,35 +29,16 @@ class collectionController {
   }
 
   async getAll(req, res) {
-    let { brandId, topicId, limit, page } = req.query
-    page = +page || 1
-    limit = +limit || 20
-    let offset = page * limit - limit
+    let { topicId } = req.query
     let collections
-    if (!brandId && !topicId) {
-      collections = await Collection.findAndCountAll({ limit, offset })
+    if (!topicId) {
+      collections = await Collection.findAll()
     }
-    if (!brandId && topicId) {
-      collections = await Collection.findAndCountAll({
-        where: { topicId },
-        limit,
-        offset,
+    if (topicId) {
+      collections = await Collection.findAll({
+        where: { TopicId: topicId },
       })
     }
-    // if (brandId && !typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { brandId },
-    //     limit,
-    //     offset,
-    //   })
-    // }
-    // if (brandId && typeId) {
-    //   devices = await Device.findAndCountAll({
-    //     where: { brandId, typeId },
-    //     limit,
-    //     offset,
-    //   })
-    // }
     return res.json(collections)
   }
 
@@ -66,13 +48,70 @@ class collectionController {
       where: { id },
       include: [
         { model: Topic, as: 'Topic' },
-        // { model: Item, as: 'Items' },
-        // { model: User, as: 'User' },
-        // { model: ItemPattern, as: 'ItemPattern' },
+        { model: User, attributes: ['id', 'name'] },
+      ],
+    })
+    return res.json(collection)
+  }
+
+  async getUserCollections(req, res) {
+    const { id } = req.params
+    const user = await User.findOne({
+      where: { id },
+      User,
+      attributes: ['id', 'name'],
+      include: [
+        {
+          model: Collection,
+          include: [
+            {
+              model: Item,
+              attributes: ['id'],
+            },
+            {
+              model: User,
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
       ],
     })
 
-    return res.json(collection)
+    return res.json(user)
+  }
+
+  async getLargest(req, res) {
+    let limit = +req.query.limit || 5
+    try {
+      const collections = await Collection.findAll({
+        attributes: ['id', 'name'],
+        include: [
+          {
+            model: Item,
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            attributes: ['id', 'name'],
+          },
+        ],
+        group: ['Collection.id'],
+        order: [
+          [
+            Sequelize.literal(
+              '(SELECT COUNT(*) FROM `Items` WHERE `Items`.`CollectionId` = `Collection`.`id`)'
+            ),
+            'DESC',
+          ],
+        ],
+        limit: limit,
+      })
+
+      res.json(collections)
+    } catch (error) {
+      console.error('Error retrieving collections:', error)
+      res.status(500).json({ message: 'Internal server error' })
+    }
   }
 
   async delete(req, res) {

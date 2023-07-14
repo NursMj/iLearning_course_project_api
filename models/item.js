@@ -49,9 +49,7 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   Item.associate = (models) => {
-    // Item.belongsTo(models.ItemPattern)
     Item.belongsTo(models.Collection)
-    Item.belongsTo(models.User)
   }
 
   return Item

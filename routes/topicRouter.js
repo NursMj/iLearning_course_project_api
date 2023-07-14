@@ -1,10 +1,10 @@
 const Router = require('express')
 const router = new Router()
 const topicController = require('../controllers/topicController')
-const checkRole = require('../middleware/checkRoleMiddleware')
+const checkAccess = require('../middleware/checkAccessMiddleware')
 
-router.post('/', checkRole('ADMIN'), topicController.create)
-router.delete('/', checkRole('ADMIN'), topicController.delete)
+router.post('/', checkAccess(), topicController.create)
+router.delete('/', checkAccess(), topicController.delete)
 router.get('/', topicController.getAll)
 
 module.exports = router

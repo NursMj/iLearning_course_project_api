@@ -1,13 +1,23 @@
 const ApiError = require('../error/ApiError')
-const { Item, Topic, ItemPattern } = require('../models')
+const { Item, Collection, User } = require('../models')
+
+const includeCollectionAndUser = {
+  model: Collection,
+  attributes: ['id', 'name'],
+  include: [
+    {
+      model: User,
+      attributes: ['id', 'name'],
+    },
+  ],
+}
 
 class itemController {
   async create(req, res, next) {
     try {
-      const { fieldValues, fieldNames, collectionId, userId } = req.body
+      const { fieldValues, fieldNames, collectionId } = req.body
 
       const item = await Item.create({
-        UserId: userId,
         CollectionId: collectionId,
         ...fieldValues,
         ...fieldNames,
@@ -21,27 +31,18 @@ class itemController {
   }
 
   async getAll(req, res) {
-    let { collectionId, limit, page } = req.query
-    page = +page || 1
-    limit = +limit || 20
-    let offset = page * limit - limit
+    let { collectionId } = req.query
     let items
     if (!collectionId) {
-      items = await Item.findAndCountAll({ limit, offset })
+      items = await Item.findAll({
+        include: [includeCollectionAndUser],
+      })
     } else {
-      items = await Item.findAndCountAll({
+      items = await Item.findAll({
         where: { CollectionId: collectionId },
-        limit,
-        offset,
+        include: [includeCollectionAndUser],
       })
     }
-    // if (brandId && typeId) {
-    //   items = await Device.findAndCountAll({
-    //     where: { brandId, typeId },
-    //     limit,
-    //     offset,
-    //   })
-    // }
     return res.json(items)
   }
 
@@ -49,13 +50,8 @@ class itemController {
     const { id } = req.params
     const item = await Item.findOne({
       where: { id },
-      // include: [
-      //   { model: Topic, as: 'Topic' }
-      // ],
+      include: [includeCollectionAndUser],
     })
-
-    // const topic = await Topic.findOne({ where: { id: item.TopicId } })
-
     return res.json(item)
   }
 
@@ -68,17 +64,18 @@ class itemController {
   }
 
   async getLatest(req, res) {
-    const { limit } = req.query
-    limit = +limit || 12
+    let limit = +req.query.limit || 12
     try {
       const latestRecords = await Item.findAll({
+        attributes: ['id', 'requiredField1_value'],
+        include: [includeCollectionAndUser],
         order: [['createdAt', 'DESC']],
         limit: limit,
       })
-      return res.json('latestRecords')
+      return res.json(latestRecords)
     } catch (error) {
-      next(ApiError.badRequest(e.message))
-      console.log(e.message)
+      console.error(error)
+      return res.status(400).json({ error: error.message })
     }
   }
 }

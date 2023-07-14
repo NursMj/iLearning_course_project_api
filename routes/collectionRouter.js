@@ -1,11 +1,13 @@
 const Router = require('express')
 const router = new Router()
 const collectionController = require('../controllers/collectionController')
-const checkRole = require('../middleware/checkRoleMiddleware')
+const checkAccess = require('../middleware/checkAccessMiddleware')
 
-router.post('/', checkRole('ADMIN'), collectionController.create)
+router.post('/', checkAccess(), collectionController.create)
 router.get('/', collectionController.getAll)
+router.get('/largest', collectionController.getLargest)
 router.get('/:id', collectionController.getOne)
-router.delete('/:id', checkRole('ADMIN'), collectionController.delete)
+router.get('/user/:id', collectionController.getUserCollections)
+router.delete('/:id', checkAccess(), collectionController.delete)
 
 module.exports = router

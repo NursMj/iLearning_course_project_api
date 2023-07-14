@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-module.exports = function (role) {
+module.exports = function () {
   return function (req, res, next) {
     if (req.method == 'OPTIONS') {
       next()
@@ -12,11 +12,14 @@ module.exports = function (role) {
       if (!token) {
         return res.status(401).json({ message: 'Not authorized' })
       }
-
+      const ownerId = req.body.userId
       const decoded = jwt.verify(token, process.env.SECRET_KEY)
-      if (decoded.role !== role) {
+      const isOwner = decoded.id === ownerId
+      console.log(ownerId)
+      if (decoded.role !== 'ADMIN' && !isOwner) {
         return res.status(403).json({ message: 'No access' })
       }
+      
       req.user = decoded
       next()
     } catch (e) {
