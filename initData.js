@@ -7,6 +7,12 @@ async function initData() {
   const hashPassword = await bcrypt.hash('123', 5)
 
   await User.create({
+    name: 'Test',
+    email: 'test@gmail.com',
+    password: hashPassword,
+    role: 'ADMIN',
+  })
+  await User.create({
     name: 'Nurs',
     email: 'Nurs@gmail.com',
     password: hashPassword,

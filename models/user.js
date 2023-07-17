@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     role: { type: DataTypes.STRING, defaultValue: 'USER' },
+    language: { type: DataTypes.STRING, defaultValue: 'en' },
+    blocked: { type: DataTypes.BOOLEAN, defaultValue: false },
+    darkMode: { type: DataTypes.BOOLEAN, defaultValue: false },
   })
 
   User.associate = (models) => {

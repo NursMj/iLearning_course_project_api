@@ -3,10 +3,31 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { User } = require('../models')
 
-const generateJwt = (id, name, email, role) => {
-  return jwt.sign({ id, name, email, role }, process.env.SECRET_KEY, {
-    expiresIn: '24h',
+const generateJwt = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      darkMode: user.darkMode,
+      language: user.language,
+    },
+    process.env.SECRET_KEY,
+    {
+      expiresIn: '1h',
+    }
+  )
+}
+
+function getUpdates(body, fields) {
+  const updates = {}
+  fields.forEach((field) => {
+    if (body[field] !== undefined) {
+      updates[field] = body[field]
+    }
   })
+  return updates
 }
 
 class UserController {
@@ -26,7 +47,7 @@ class UserController {
       role,
       password: hashPassword,
     })
-    const token = generateJwt(user.id, user.name, user.email, user.role)
+    const token = generateJwt(user)
     return res.json({ token })
   }
 
@@ -38,25 +59,69 @@ class UserController {
       return next(ApiError.badRequest('User with this email does not exist'))
     }
 
-    let comarePassword = bcrypt.compareSync(password, user.password)
-    if (!comarePassword) {
+    let comparePassword = bcrypt.compareSync(password, user.password)
+    if (!comparePassword) {
       return next(ApiError.badRequest('Wrong password'))
     }
-
-    const token = generateJwt(user.id, user.name, user.email, user.role)
+    const token = generateJwt(user)
     return res.json({ token })
   }
 
   async check(req, res, next) {
-    const token = generateJwt(
-      req.user.id,
-      req.user.name,
-      req.user.email,
-      req.user.role,
-    )
+    const token = generateJwt(req.user)
     return res.json({ token })
   }
-  
+
+  async getAll(req, res) {
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'role', 'email', 'blocked']
+    })
+    return res.json(users)
+  }
+
+  async updateByAdmin(req, res) {
+    const { id } = req.params
+    const updates = getUpdates(req.body, ['role', 'blocked'])
+
+    try {
+      const [updatedRowsCount] = await User.update(updates, {
+        where: { id },
+      })
+      if (updatedRowsCount === 0) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      return res.json({ message: 'User updated successfully' })
+    } catch (error) {
+      console.error('Error updating User:', error)
+      return res.status(500).json({ error: 'Internal server error' })
+    }
+  }
+
+  async updateByUser(req, res) {
+    const { id } = req.params
+    const updates = getUpdates(req.body, ['darkMode', 'language'])
+
+    try {
+      const [updatedRowsCount] = await User.update(updates, {
+        where: { id },
+      })
+      if (updatedRowsCount === 0) {
+        return res.status(404).json({ error: 'Record not found' })
+      }
+      return res.json({ message: 'Record updated successfully' })
+    } catch (error) {
+      console.error('Error updating record:', error)
+      return res.status(500).json({ error: 'Internal server error' })
+    }
+  }
+
+  async delete(req, res) {
+    const { id } = req.params
+    await User.destroy({
+      where: { id },
+    })
+    res.json({ message: 'User deleted successfully' })
+  }
 }
 
 module.exports = new UserController()
