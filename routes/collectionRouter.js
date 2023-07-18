@@ -3,12 +3,12 @@ const router = new Router()
 const collectionController = require('../controllers/collectionController')
 const checkAccess = require('../middleware/checkAccessMiddleware')
 const multer = require('multer')
-const upload = multer({dest: 'uploads/'})
+const upload = multer({ dest: 'uploads/' })
 
 router.post(
   '/',
-  checkAccess(),
   upload.single('img'),
+  checkAccess(),
   collectionController.create
 )
 router.get('/', collectionController.getAll)

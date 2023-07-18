@@ -14,9 +14,9 @@ module.exports = function () {
         return res.status(401).json({ message: 'Not authorized' })
       }
 
-      const ownerId = req.body.userId
+      const {userId} = req.body
       const decoded = jwt.verify(token, process.env.SECRET_KEY)
-      const isOwner = decoded.id === ownerId
+      const isOwner = decoded.id === +userId
       const realTimeUser = await User.findOne({ where: { id: decoded.id } })
 
       if (!realTimeUser) {
