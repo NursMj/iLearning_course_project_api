@@ -35,11 +35,11 @@ module.exports = (sequelize, DataTypes) => {
     // multilineField3_name: { type: DataTypes.STRING, allowNull: true, },
     multilineField3_value: { type: DataTypes.TEXT, allowNull: true },
     // dooleanField1_name: { type: DataTypes.STRING, allowNull: true, },
-    dooleanField1_value: { type: DataTypes.BOOLEAN, allowNull: true },
+    booleanField1_value: { type: DataTypes.BOOLEAN, allowNull: true },
     // dooleanField2_name: { type: DataTypes.STRING, allowNull: true, },
-    dooleanField2_value: { type: DataTypes.BOOLEAN, allowNull: true },
+    booleanField2_value: { type: DataTypes.BOOLEAN, allowNull: true },
     // dooleanField3_name: { type: DataTypes.STRING, allowNull: true, },
-    dooleanField3_value: { type: DataTypes.BOOLEAN, allowNull: true },
+    booleanField3_value: { type: DataTypes.BOOLEAN, allowNull: true },
     // dateField1_name: { type: DataTypes.STRING, allowNull: true, },
     dateField1_value: { type: DataTypes.DATE, allowNull: true },
     // dateField2_name: { type: DataTypes.STRING, allowNull: true, },
@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Item.associate = (models) => {
     Item.belongsTo(models.Collection)
+    Item.hasMany(models.Like)
   }
 
   return Item

@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const { Item, Collection, User } = require('../models')
+const { Item, Collection, User, Like } = require('../models')
 
 const includeCollectionAndUser = {
   model: Collection,
@@ -50,7 +50,21 @@ class itemController {
     const { id } = req.params
     const item = await Item.findOne({
       where: { id },
-      include: [includeCollectionAndUser],
+      include: [
+        {
+          model: Collection,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'name'],
+            },
+          ],
+        },
+        {
+          model: Like,
+          attributes: ['id', 'UserId'],
+        },
+      ],
     })
     return res.json(item)
   }
