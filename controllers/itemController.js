@@ -1,5 +1,6 @@
 const ApiError = require('../error/ApiError')
-const { Item, Collection, User, Like } = require('../models')
+const { Item, Collection, User, Like, Tag } = require('../models')
+const Sequelize = require('sequelize')
 
 const includeCollectionAndUser = {
   model: Collection,
@@ -12,37 +13,81 @@ const includeCollectionAndUser = {
   ],
 }
 
-class itemController {
+const includeItemLikesCount = {
+  include: [
+    [
+      Sequelize.literal(
+        '(SELECT COUNT(*) FROM Likes WHERE Likes.ItemId = Item.id)'
+      ),
+      'likesCount',
+    ],
+  ],
+}
+
+class ItemController {
   async create(req, res, next) {
     try {
-      const { fieldValues, fieldNames, collectionId } = req.body
-
+      const { fieldValues, fieldNames, collectionId, tags } = req.body
+      console.log(tags)
       const item = await Item.create({
         CollectionId: collectionId,
         ...fieldValues,
         ...fieldNames,
       })
 
+      if (tags) {
+        const tagList = await Promise.all(
+          tags.map(async (t) => {
+            const [tag] = await Tag.findOrCreate({ where: { name: t.text } })
+            return tag
+          })
+        )
+
+        await item.setTags(tagList)
+      }
+
       return res.json(item)
     } catch (e) {
-      next(ApiError.badRequest(e.message))
       console.log(e.message)
+      next(ApiError.badRequest(e.message))
     }
   }
 
   async getAll(req, res) {
-    let { collectionId } = req.query
+    let { collectionId, tagId } = req.query
     let items
     if (!collectionId) {
       items = await Item.findAll({
+        attributes: includeItemLikesCount,
         include: [includeCollectionAndUser],
       })
-    } else {
+    }
+    if (collectionId) {
       items = await Item.findAll({
+        attributes: includeItemLikesCount,
         where: { CollectionId: collectionId },
         include: [includeCollectionAndUser],
       })
     }
+    if (tagId) {
+      const tag = await Tag.findOne({
+        where: { id: tagId },
+        include: [
+          {
+            model: Item,
+            include: [
+              includeCollectionAndUser,
+              {
+                model: Like,
+                attributes: ['id'],
+              },
+            ],
+          },
+        ],
+      })
+      return res.json(tag)
+    }
+
     return res.json(items)
   }
 
@@ -64,6 +109,10 @@ class itemController {
           model: Like,
           attributes: ['id', 'UserId'],
         },
+        {
+          model: Tag,
+          attributes: ['id', 'name'],
+        },
       ],
     })
     return res.json(item)
@@ -82,6 +131,16 @@ class itemController {
     try {
       const latestRecords = await Item.findAll({
         attributes: ['id', 'requiredField1_value'],
+        attributes: {
+          include: [
+            [
+              Sequelize.literal(
+                '(SELECT COUNT(*) FROM Likes WHERE Likes.ItemId = Item.id)'
+              ),
+              'likesCount',
+            ],
+          ],
+        },
         include: [includeCollectionAndUser],
         order: [['createdAt', 'DESC']],
         limit: limit,
@@ -94,4 +153,4 @@ class itemController {
   }
 }
 
-module.exports = new itemController()
+module.exports = new ItemController()

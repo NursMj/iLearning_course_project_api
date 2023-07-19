@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Item.associate = (models) => {
     Item.belongsTo(models.Collection)
+    Item.belongsToMany(models.Tag, { through: 'ItemTag' })
     Item.hasMany(models.Like)
   }
 

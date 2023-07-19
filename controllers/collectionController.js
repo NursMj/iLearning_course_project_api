@@ -13,7 +13,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3()
 
-class collectionController {
+class CollectionController {
   async create(req, res, next) {
     try {
       const file = req.file
@@ -146,4 +146,4 @@ class collectionController {
   }
 }
 
-module.exports = new collectionController()
+module.exports = new CollectionController()

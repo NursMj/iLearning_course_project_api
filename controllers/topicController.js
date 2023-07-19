@@ -1,7 +1,7 @@
 const { Topic } = require('../models')
 const ApiError = require('../error/ApiError')
 
-class TypeController {
+class TopicController {
   async create(req, res) {
     const { name } = req.body
     const topic = await Topic.create({ name })
@@ -20,4 +20,4 @@ class TypeController {
   }
 }
 
-module.exports = new TypeController()
+module.exports = new TopicController()
