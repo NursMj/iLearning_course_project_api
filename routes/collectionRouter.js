@@ -11,6 +11,12 @@ router.post(
   checkAccess(),
   collectionController.create
 )
+router.put(
+  '/:id',
+  upload.single('img'),
+  checkAccess(),
+  collectionController.update
+)
 router.get('/', collectionController.getAll)
 router.get('/largest', collectionController.getLargest)
 router.get('/:id', collectionController.getOne)

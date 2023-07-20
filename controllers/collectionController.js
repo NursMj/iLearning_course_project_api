@@ -11,6 +11,20 @@ AWS.config.update({
   region: process.env.AWS_BUCKET_REGION,
 })
 
+const uplodeImgToAws = async (file) => {
+  const fileKey = `${uuidv4()}-${file.originalname}`
+  const fileData = fs.readFileSync(file.path)
+  const uploadResult = await s3
+    .upload({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileKey,
+      Body: fileData,
+    })
+    .promise()
+
+  return uploadResult.Location
+}
+
 const s3 = new AWS.S3()
 
 class CollectionController {
@@ -21,18 +35,7 @@ class CollectionController {
       const parsedItemFileds = JSON.parse(itemFields)
       let img = ''
       if (file != undefined) {
-        const fileKey = `${uuidv4()}-${file.originalname}`
-        const fileData = fs.readFileSync(file.path)
-        console.log(fileData)
-        const uploadResult = await s3
-          .upload({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: fileKey,
-            Body: fileData,
-          })
-          .promise()
-
-        img = uploadResult.Location
+        img = await uplodeImgToAws(file)
       }
 
       const collection = await Collection.create({
@@ -44,10 +47,35 @@ class CollectionController {
         ...parsedItemFileds,
       })
 
-      return res.json(collection)
+      return res.json({ message: 'Collection created successfully' })
     } catch (e) {
       next(ApiError.badRequest(e.message))
       console.log(e.message)
+    }
+  }
+
+  async update(req, res) {
+    const { id } = req.params
+    const file = req.file
+    const { name, desc, topicId } = req.body
+    let img = ''
+    try {
+      if (file != undefined) {
+        img = await uplodeImgToAws(file)
+      }
+      const [updatedRowsCount] = await Collection.update(
+        { name, desc, TopicId: topicId, img },
+        {
+          where: { id },
+        }
+      )
+      if (updatedRowsCount === 0) {
+        return res.status(404).json({ error: 'Collection not found' })
+      }
+      return res.json({ message: 'Collection updated successfully' })
+    } catch (error) {
+      console.error('Error updating Collection:', error)
+      return res.status(500).json({ error: 'Internal server error' })
     }
   }
 

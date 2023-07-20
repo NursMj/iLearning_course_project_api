@@ -1,9 +1,16 @@
 const topics = require('./topics.js')
 const { Topic, User } = require('./models')
+const db = require('./models')
 
 const bcrypt = require('bcrypt')
 
+
+
 async function initData() {
+
+  await db.sequelize.authenticate()
+  await db.sequelize.sync({force : true})
+
   const hashPassword = await bcrypt.hash('123', 5)
 
   await User.create({
