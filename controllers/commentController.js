@@ -1,4 +1,5 @@
 const { Comment, User } = require('../models')
+const { sendMessage } = require('../socket')
 
 class CommentController {
   async create(req, res) {
@@ -10,6 +11,7 @@ class CommentController {
         UserId: userId,
         ItemId: itemId,
       })
+      sendMessage(itemId, 'commentCreated')
       return res.json(comment)
     } catch (error) {
       console.error('Error creating comment:', error)
