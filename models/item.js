@@ -52,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
     Item.belongsTo(models.Collection)
     Item.belongsToMany(models.Tag, { through: 'ItemTag' })
     Item.hasMany(models.Like)
+    Item.hasMany(models.Comment)
   }
 
   return Item
