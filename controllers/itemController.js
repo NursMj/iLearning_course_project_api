@@ -45,11 +45,40 @@ class ItemController {
 
         await item.setTags(tagList)
       }
-
-      return res.json(item)
+      return res.json({ message: 'Item created successfully'})
     } catch (e) {
       console.log(e.message)
       next(ApiError.badRequest(e.message))
+    }
+  }
+
+  async update(req, res) {
+    const { id } = req.params
+    const { fieldValues, tags } = req.body
+    try {
+      const item = await Item.findByPk(id)
+      if (!item) return res.status(404).json({ error: 'Item not found' })
+      const existingTags = await item.getTags()
+      if (tags) {
+        const tagList = await Promise.all(
+          tags.map(async (t) => {
+            const [tag] = await Tag.findOrCreate({ where: { name: t.text } })
+            return tag
+          })
+        )
+        await item.addTags(tagList)
+      }
+      if (tags) {
+        const tagsToRemove = existingTags.filter((tag) => {
+          return !tags.some((t) => t.text === tag.name)
+        })
+        await item.removeTags(tagsToRemove)
+      }
+      await item.update(fieldValues)
+      return res.json({ message: 'Item updated successfully'})
+    } catch (error) {
+      console.error('Error updating Item:', error)
+      return res.status(500).json({ error: 'Internal server error' })
     }
   }
 
