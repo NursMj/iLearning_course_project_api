@@ -1,40 +1,46 @@
 const {
   client,
-  indexName,
   collectionMapping,
   itemMapping,
   commentMapping,
 } = require('./elasticsearch')
-const { indexCollections, indexItems, indexComments } = require('./indexing')
+const { indexCollection, indexItem, indexComment } = require('./indexing')
+const { Collection, Item, Comment } = require('../models')
 
 async function setupElasticsearch() {
+  // await client.indices.create({
+  //   index: 'collections',
+  //   body: {
+  //     mappings: {
+  //       properties: collectionMapping.properties,
+  //     },
+  //   },
+  // })
+  // await client.indices.create({
+  //   index: 'items',
+  //   body: {
+  //     mappings: {
+  //       properties: itemMapping.properties,
+  //     },
+  //   },
+  // })
   await client.indices.create({
-    index: indexName,
-    body: {
-      mappings: {
-        properties: collectionMapping.properties,
-      },
-    },
-  })
-  await client.indices.create({
-    index: indexName,
-    body: {
-      mappings: {
-        properties: itemMapping.properties,
-      },
-    },
-  })
-  await client.indices.create({
-    index: indexName,
+    index: 'comments',
     body: {
       mappings: {
         properties: commentMapping.properties,
       },
     },
   })
-  await indexCollections()
-  await indexItems()
-  await indexComments()
+
+  // const collections = await Collection.findAll()
+  // collections.map(async (collection) => await indexCollection(collection))
+
+  // const items = await Item.findAll()
+  // items.map(async (item) => await indexItem(item))
+
+  const comments = await Comment.findAll()
+  comments.map(async (comment) => await indexComment(comment))
 }
 
-module.exports = {setupElasticsearch}
+setupElasticsearch()

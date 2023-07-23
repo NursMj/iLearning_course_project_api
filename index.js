@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { socketConnection } = require('./socket')
+const { socketConnection } = require('./utils/socket')
 const express = require('express')
 const cors = require('cors')
 const fileUpload = require('express-fileupload')

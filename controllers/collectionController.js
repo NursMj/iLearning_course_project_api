@@ -4,6 +4,7 @@ const ApiError = require('../error/ApiError')
 const { Collection, Topic, Item, User } = require('../models')
 const AWS = require('aws-sdk')
 const { v4: uuidv4 } = require('uuid')
+const { indexCollection, unindexCollection } = require('../utils/indexing')
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -46,7 +47,7 @@ class CollectionController {
         img,
         ...parsedItemFileds,
       })
-
+      await indexCollection(collection)
       return res.json({ message: 'Collection created successfully' })
     } catch (e) {
       next(ApiError.badRequest(e.message))
@@ -72,6 +73,8 @@ class CollectionController {
       if (updatedRowsCount === 0) {
         return res.status(404).json({ error: 'Collection not found' })
       }
+      const collection = await Collection.findOne({ where: { id } })
+      await indexCollection(collection)
       return res.json({ message: 'Collection updated successfully' })
     } catch (error) {
       console.error('Error updating Collection:', error)
@@ -170,6 +173,7 @@ class CollectionController {
     await Collection.destroy({
       where: { id },
     })
+    await unindexCollection(id)
     res.json({ message: 'Collection deleted successfully' })
   }
 }

@@ -1,6 +1,7 @@
 const ApiError = require('../error/ApiError')
 const { Item, Collection, User, Like, Tag } = require('../models')
 const Sequelize = require('sequelize')
+const { indexItem, unindexItem } = require('../utils/indexing')
 
 const includeCollectionAndUser = {
   model: Collection,
@@ -45,7 +46,8 @@ class ItemController {
 
         await item.setTags(tagList)
       }
-      return res.json({ message: 'Item created successfully'})
+      await indexItem(item)
+      return res.json({ message: 'Item created successfully' })
     } catch (e) {
       console.log(e.message)
       next(ApiError.badRequest(e.message))
@@ -75,7 +77,8 @@ class ItemController {
         await item.removeTags(tagsToRemove)
       }
       await item.update(fieldValues)
-      return res.json({ message: 'Item updated successfully'})
+      await indexItems(item)
+      return res.json({ message: 'Item updated successfully' })
     } catch (error) {
       console.error('Error updating Item:', error)
       return res.status(500).json({ error: 'Internal server error' })
@@ -152,6 +155,7 @@ class ItemController {
     await Item.destroy({
       where: { id },
     })
+    await unindexItem(id)
     res.json({ message: 'Item deleted successfully' })
   }
 

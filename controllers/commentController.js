@@ -1,5 +1,6 @@
 const { Comment, User } = require('../models')
-const { sendMessage } = require('../socket')
+const { sendMessage } = require('../utils/socket')
+const { indexComment, unindexComment } = require('../utils/indexing')
 
 class CommentController {
   async create(req, res) {
@@ -11,6 +12,7 @@ class CommentController {
         UserId: userId,
         ItemId: itemId,
       })
+      await indexComment(comment)
       sendMessage(itemId, 'commentCreated')
       return res.json(comment)
     } catch (error) {
@@ -45,6 +47,7 @@ class CommentController {
           .json({ error: 'You are not authorized to delete this comment' })
       }
       await comment.destroy()
+      await unindexComment(id)
       return res.json({ message: 'Comment deleted successfully' })
     } catch (error) {
       console.error('Error deleting comment:', error)

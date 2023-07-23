@@ -7,6 +7,7 @@ const topicRouter = require('./topicRouter')
 const likeRouter = require('./likeRouter')
 const tagRouter = require('./tagRouter')
 const commentRouter = require('./commentRouter')
+const searchRouter = require('./searchRouter')
 
 router.use('/user', userRouter)
 router.use('/collection', collectionRouter)
@@ -15,5 +16,6 @@ router.use('/topic', topicRouter)
 router.use('/like', likeRouter)
 router.use('/tag', tagRouter)
 router.use('/comment', commentRouter)
+router.use('/search', searchRouter)
 
 module.exports = router
