@@ -1,7 +1,8 @@
 const ApiError = require('../error/ApiError')
 const { Item, Collection, User, Like, Tag } = require('../models')
 const Sequelize = require('sequelize')
-const { indexItem, unindexItem } = require('../utils/indexing')
+const { indexItem } = require('../utils/indexing')
+const { deleteUnindexItem } = require('../utils/deletingFunctions')
 
 const includeCollectionAndUser = {
   model: Collection,
@@ -150,15 +151,6 @@ class ItemController {
     return res.json(item)
   }
 
-  async delete(req, res) {
-    const { id } = req.params
-    await Item.destroy({
-      where: { id },
-    })
-    await unindexItem(id)
-    res.json({ message: 'Item deleted successfully' })
-  }
-
   async getLatest(req, res) {
     let limit = +req.query.limit || 12
     try {
@@ -179,6 +171,17 @@ class ItemController {
         limit: limit,
       })
       return res.json(latestRecords)
+    } catch (error) {
+      console.error(error)
+      return res.status(400).json({ error: error.message })
+    }
+  }
+
+  async delete(req, res) {
+    const { id } = req.params
+    try {
+      deleteUnindexItem(id)
+      res.json({ message: 'Item deleted successfully' })
     } catch (error) {
       console.error(error)
       return res.status(400).json({ error: error.message })

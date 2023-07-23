@@ -4,7 +4,8 @@ const ApiError = require('../error/ApiError')
 const { Collection, Topic, Item, User } = require('../models')
 const AWS = require('aws-sdk')
 const { v4: uuidv4 } = require('uuid')
-const { indexCollection, unindexCollection } = require('../utils/indexing')
+const { indexCollection } = require('../utils/indexing')
+const { deleteUnindexCollection } = require('../utils/deletingFunctions')
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -170,11 +171,14 @@ class CollectionController {
 
   async delete(req, res) {
     const { id } = req.params
-    await Collection.destroy({
-      where: { id },
-    })
-    await unindexCollection(id)
-    res.json({ message: 'Collection deleted successfully' })
+
+    try {
+      deleteUnindexCollection(id)
+      res.json({ message: 'Collection deleted successfully' })
+    } catch (error) {
+      console.error(error)
+      return res.status(400).json({ error: error.message })
+    }
   }
 }
 

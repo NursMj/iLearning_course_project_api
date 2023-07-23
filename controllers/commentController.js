@@ -46,8 +46,8 @@ class CommentController {
           .status(403)
           .json({ error: 'You are not authorized to delete this comment' })
       }
-      await comment.destroy()
-      await unindexComment(id)
+      await Comment.destroy({ where: { id: commentId } })
+      await unindexComment(commentId)
       return res.json({ message: 'Comment deleted successfully' })
     } catch (error) {
       console.error('Error deleting comment:', error)
