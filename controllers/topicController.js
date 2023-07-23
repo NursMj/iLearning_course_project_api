@@ -9,8 +9,8 @@ class TopicController {
   }
 
   async delete(req, res) {
-    const { name } = req.body
-    await Topic.destroy({ where: { name: name } })
+    const { id } = req.params
+    await Topic.destroy({ where: { id } })
     res.json({ message: 'Topic deleted successfully' })
   }
 
