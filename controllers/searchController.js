@@ -38,7 +38,18 @@ const includeCollectionUserLikes = [
   },
 ]
 
-class TagController {
+const includeCollectionUser = {
+  model: Collection,
+  attributes: ['id', 'name'],
+  include: [
+    {
+      model: User,
+      attributes: ['id', 'name'],
+    },
+  ],
+}
+
+class SearchController {
   async search(req, res) {
     const searchText = req.query.searchText
 
@@ -56,6 +67,7 @@ class TagController {
       })
 
       const hits = [...body.hits.hits]
+      console.log(hits)
       let resultsCollections = []
       let resultsItems = []
       await Promise.all(
@@ -89,16 +101,16 @@ class TagController {
               await Item.findOne({
                 where: {
                   id: hit._source.ItemId,
-                  include: includeCollectionUserLikes,
                 },
+                include: includeCollectionUserLikes,
               })
             )
           }
         })
       )
       const results = {
-        collections: _.uniqBy(resultsCollections, 'id'),
-        items: _.uniqBy(resultsItems, 'id'),
+        collections: _.uniqBy(resultsCollections, 'id').filter((item) => item !== null),
+        items: _.uniqBy(resultsItems, 'id').filter((item) => item !== null),
       }
       res.json(results)
     } catch (error) {
@@ -108,4 +120,4 @@ class TagController {
   }
 }
 
-module.exports = new TagController()
+module.exports = new SearchController()
