@@ -24,7 +24,6 @@ const filedsToSearch = [
 const includeCollectionUserLikes = [
   {
     model: Collection,
-    attributes: ['id', 'name'],
     include: [
       {
         model: User,
@@ -40,7 +39,6 @@ const includeCollectionUserLikes = [
 
 const includeCollectionUser = {
   model: Collection,
-  attributes: ['id', 'name'],
   include: [
     {
       model: User,
@@ -80,7 +78,6 @@ class SearchController {
                 include: [
                   {
                     model: Item,
-                    attributes: ['id'],
                   },
                   {
                     model: User,
