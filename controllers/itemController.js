@@ -6,7 +6,6 @@ const { deleteUnindexItem } = require('../utils/deletingFunctions')
 
 const includeCollectionAndUser = {
   model: Collection,
-  attributes: ['id', 'name'],
   include: [
     {
       model: User,
